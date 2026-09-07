@@ -1,0 +1,33 @@
+@if (Items.Count == 0)
+{
+    <section class="empty-state">
+        <div class="empty-icon">∅</div>
+        <h3>No records found</h3>
+        <p>The connected database has no records for this workspace yet.</p>
+    </section>
+}
+else
+{
+    <section class="entity-grid">
+        @foreach (var item in Items)
+        {
+            <article class="entity-card">
+                <div class="entity-head">
+                    <span class="source-chip">@item.Source</span>
+                    <StatusPill Text="@item.Status" />
+                </div>
+                <h3>@item.Title</h3>
+                <p>@item.Subtitle</p>
+                <div class="entity-detail">@item.Detail</div>
+                @if (!string.IsNullOrWhiteSpace(item.Date))
+                {
+                    <time>@item.Date</time>
+                }
+            </article>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<EntityCard> Items { get; set; } = [];
+}

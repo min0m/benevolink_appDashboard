@@ -1,0 +1,52 @@
+@page "/register"
+@layout AuthLayout
+@inject NavigationManager Nav
+
+<section class="login-shell register-shell">
+    <div class="login-brand-panel">
+        <div class="brand premium"><span class="brand-mark">B</span><span><strong>BenevoLink</strong><em>ImpactOS</em></span></div>
+        <h1>Create a live BenevoLink account inside your XAMPP database.</h1>
+        <p>This registration screen writes to the existing <strong>users</strong> table only. It does not create a new database and it does not replace your current demo accounts.</p>
+        <div class="login-metrics">
+            <span><strong>Volunteer</strong> missions & certificates</span>
+            <span><strong>Organization</strong> recruiting & events</span>
+            <span><strong>Admin</strong> control center</span>
+        </div>
+    </div>
+
+    <form class="login-card" method="post" action="/auth/register">
+        <div class="eyebrow">Account creation</div>
+        <h2>Join BenevoLink</h2>
+        <p>Use this only when you want to add a new real user into your local <strong>benevolink</strong> MySQL database.</p>
+
+        @if (!string.IsNullOrWhiteSpace(Error))
+        {
+            <div class="alert danger">@Error</div>
+        }
+
+        <label>Full name</label>
+        <input name="name" type="text" autocomplete="name" required />
+        <label>Email</label>
+        <input name="email" type="email" autocomplete="username" required />
+        <label>Password</label>
+        <input name="password" type="password" autocomplete="new-password" required />
+        <label>Role</label>
+        <select class="control-input" name="role">
+            <option value="Volunteer">Volunteer</option>
+            <option value="Organization">Organization</option>
+        </select>
+        <button class="btn primary wide" type="submit">Create account</button>
+        <a class="btn ghost wide" href="/login">Back to login</a>
+    </form>
+</section>
+
+@code {
+    private string Error => Query("error");
+
+    private string Query(string key)
+    {
+        var uri = new Uri(Nav.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        return query.TryGetValue(key, out var value) ? value.ToString() : "";
+    }
+}

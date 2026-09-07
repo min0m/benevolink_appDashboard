@@ -1,0 +1,52 @@
+<section class="data-panel">
+    <header>
+        <div>
+            <h3>@Grid.Title</h3>
+            <p>@Grid.Subtitle</p>
+        </div>
+        <span class="source-chip @(Grid.IsLive ? "live" : "")">@Grid.Source</span>
+    </header>
+
+    @if (Grid.Rows.Count == 0)
+    {
+        <div class="empty-inline">No rows available for this source.</div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        @foreach (var column in Columns)
+                        {
+                            <th>@Pretty(column)</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Grid.Rows)
+                    {
+                        <tr>
+                            @foreach (var column in Columns)
+                            {
+                                <td title="@Cell(row, column)">@Compact(Cell(row, column))</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter] public DataGrid Grid { get; set; } = new();
+
+    private IReadOnlyList<string> Columns => Grid.PreferredColumns.Count > 0
+        ? Grid.PreferredColumns.Take(8).ToList()
+        : Grid.Rows.SelectMany(r => r.Keys).Distinct(StringComparer.OrdinalIgnoreCase).Take(8).ToList();
+
+    private static string Pretty(string value) => value.Replace("_", " ").Replace("Id", "ID");
+    private static string Cell(Dictionary<string, string> row, string column) => row.TryGetValue(column, out var value) ? value : "";
+    private static string Compact(string value) => string.IsNullOrWhiteSpace(value) ? "—" : value.Length > 90 ? value[..90] + "…" : value;
+}

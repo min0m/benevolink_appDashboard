@@ -1,0 +1,31 @@
+@inject NavigationManager Nav
+
+@if (_message is not null)
+{
+    <div class="alert @(_success ? "success" : "danger") action-alert">
+        <strong>@(_success ? "Done" : "Action failed")</strong>
+        <span>@_message</span>
+        <a href="@_cleanUrl" class="alert-close">Clear</a>
+    </div>
+}
+
+@code {
+    private string? _message;
+    private bool _success;
+    private string _cleanUrl = "/";
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(Nav.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        if (query.TryGetValue("ok", out var ok)) { _message = ok.ToString(); _success = true; }
+        else if (query.TryGetValue("error", out var error)) { _message = error.ToString(); _success = false; }
+        _cleanUrl = uri.GetLeftPart(UriPartial.Path);
+        var keep = query.Where(x => x.Key is not "ok" and not "error").ToList();
+        if (keep.Count > 0)
+        {
+            var rebuilt = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(_cleanUrl, keep.ToDictionary(x => x.Key, x => x.Value.ToString()));
+            _cleanUrl = rebuilt;
+        }
+    }
+}

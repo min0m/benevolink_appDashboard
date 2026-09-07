@@ -1,0 +1,34 @@
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthStateProvider
+@inject PlatformService Platform
+
+<div class="app-shell">
+    <NavMenu />
+    <main class="workspace">
+        <header class="topbar">
+            <div>
+                <div class="microcopy">BenevoLink ImpactOS · Light enterprise mode</div>
+                <h1>@(_user?.DisplayName ?? "Command workspace")</h1>
+            </div>
+            <div class="topbar-actions">
+                <a class="pill live" href="/database">XAMPP MySQL</a>
+                <form method="post" action="/auth/logout">
+                    <button class="btn ghost" type="submit">Sign out</button>
+                </form>
+            </div>
+        </header>
+        <article class="workspace-body">
+            <ActionAlert />
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private AppUser? _user;
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthStateProvider.GetAuthenticationStateAsync();
+        _user = AppUser.FromClaims(state.User);
+    }
+}

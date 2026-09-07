@@ -1,0 +1,11 @@
+<PageHero Eyebrow="@Model.Eyebrow" Title="@Model.Title" Subtitle="@Model.Subtitle" Health="@Model.Health" />
+<KpiStrip Items="@Model.Kpis" />
+<EntityCardGrid Items="@Model.PrimaryCards" />
+@foreach (var grid in Model.Grids)
+{
+    <DataGridView Grid="@grid" />
+}
+
+@code {
+    [Parameter, EditorRequired] public WorkspaceModel Model { get; set; } = new();
+}

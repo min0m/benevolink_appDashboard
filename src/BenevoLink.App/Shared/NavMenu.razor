@@ -1,0 +1,44 @@
+@inject AuthenticationStateProvider AuthStateProvider
+
+<aside class="sidebar">
+    <a class="brand" href="/">
+        <span class="brand-mark">B</span>
+        <span>
+            <strong>BenevoLink</strong>
+            <em>ImpactOS</em>
+        </span>
+    </a>
+
+    <nav class="nav-stack">
+        <NavLink href="/" Match="NavLinkMatch.All"><span>◈</span> Command Center</NavLink>
+        <NavLink href="/missions"><span>◎</span> Missions</NavLink>
+        <NavLink href="/organizations"><span>▣</span> Organizations</NavLink>
+        <NavLink href="/volunteers"><span>◍</span> Volunteers</NavLink>
+        <NavLink href="/profile"><span>◉</span> My Profile</NavLink>
+        <NavLink href="/applications"><span>▤</span> Applications</NavLink>
+        <NavLink href="/events"><span>◇</span> Events</NavLink>
+        <NavLink href="/impact"><span>⬡</span> Analytics & Impact</NavLink>
+        <NavLink href="/certificates"><span>✦</span> Certificates</NavLink>
+        <NavLink href="/notifications"><span>◌</span> Notifications</NavLink>
+        <NavLink href="/admin"><span>⌘</span> Admin Center</NavLink>
+        <NavLink href="/database"><span>▥</span> Database Link</NavLink>
+    </nav>
+
+    <section class="operator-card">
+        <div class="operator-avatar">@Initials</div>
+        <div>
+            <strong>@(_user?.DisplayName ?? "Operator")</strong>
+            <span>@(_user?.Role ?? "Workspace")</span>
+        </div>
+    </section>
+</aside>
+
+@code {
+    private AppUser? _user;
+    private string Initials => string.Join("", (_user?.DisplayName ?? "BL").Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthStateProvider.GetAuthenticationStateAsync();
+        _user = AppUser.FromClaims(state.User);
+    }
+}

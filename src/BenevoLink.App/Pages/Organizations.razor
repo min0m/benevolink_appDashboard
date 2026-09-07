@@ -1,0 +1,106 @@
+@page "/organizations"
+@attribute [Authorize]
+@inject PlatformService Platform
+@inject OperationsService Ops
+@inject AuthenticationStateProvider AuthState
+
+@if (_model is null || _organizations is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Loading organization workspace…</strong></section>
+}
+else
+{
+    <PageHero Eyebrow="NGO Workspace" Title="Organizations" Subtitle="Manage NGO profile, verification requests, recruitment messages, and admin verification." />
+    <KpiStrip Items="@_model.Kpis" />
+
+    <section class="creation-panel two-columns pro-form-card">
+        <form method="post" action="/actions/organization/save" class="form-stack professional-form-stack">
+            <input type="hidden" name="returnUrl" value="/organizations" />
+            <div class="eyebrow">Profile editor</div>
+            <h3>Save organization profile</h3>
+            <input class="control-input" name="associationId" placeholder="Association / NGO ID" value="@_user?.Id" />
+            <input class="control-input" name="name" placeholder="Organization name" />
+            <input class="control-input" name="sector" placeholder="Sector / Cause" />
+            <input class="control-input" name="city" placeholder="City" />
+            <input class="control-input" name="email" placeholder="Contact email" />
+            <textarea class="control-input textarea-pro" rows="4" name="description" placeholder="Organization description"></textarea>
+            <button type="submit" class="btn primary">Save organization</button>
+        </form>
+
+        <div class="form-stack professional-form-stack">
+            <form method="post" action="/actions/organization/request" class="mini-panel-form">
+                <input type="hidden" name="returnUrl" value="/organizations" />
+                <div class="eyebrow">Verification</div>
+                <h3>Request verification</h3>
+                <input class="control-input" name="subject" value="NGO verification request" />
+                <textarea class="control-input textarea-pro" rows="4" name="message" placeholder="Share license, proof, and organization details"></textarea>
+                <button type="submit" class="btn ghost">Request verification</button>
+            </form>
+
+            <form method="post" action="/actions/message/send" class="mini-panel-form">
+                <input type="hidden" name="returnUrl" value="/organizations" />
+                <div class="eyebrow">Recruitment</div>
+                <h3>Send message</h3>
+                <input class="control-input" name="recipientId" placeholder="Volunteer/User ID" required />
+                <input class="control-input" name="title" placeholder="Message title" />
+                <textarea class="control-input textarea-pro" rows="3" name="message" placeholder="Recruitment message"></textarea>
+                <button type="submit" class="btn primary">Send message</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="mission-market">
+        @foreach (var org in _organizations)
+        {
+            <article class="mission-tile mission-tile-fixed">
+                <div class="entity-head">
+                    <span class="source-chip">@org.Source</span>
+                    <StatusPill Text="@org.Status" />
+                </div>
+                <h3>@org.Name</h3>
+                <p>@org.Description</p>
+                <div class="mission-meta">
+                    <span>ID: @org.Id</span>
+                    <span>🏙 @org.City</span>
+                    <span>🎯 @org.Sector</span>
+                    <span>✉ @org.Email</span>
+                </div>
+                @if (_user?.Role == "Admin")
+                {
+                    <div class="mission-actions form-actions">
+                        <form method="post" action="/actions/organization/verify" class="inline-action-form">
+                            <input type="hidden" name="returnUrl" value="/organizations" />
+                            <input type="hidden" name="associationId" value="@org.Id" />
+                            <input type="hidden" name="decision" value="Verified" />
+                            <button type="submit" class="btn primary">Verify</button>
+                        </form>
+                        <form method="post" action="/actions/organization/verify" class="inline-action-form">
+                            <input type="hidden" name="returnUrl" value="/organizations" />
+                            <input type="hidden" name="associationId" value="@org.Id" />
+                            <input type="hidden" name="decision" value="Rejected" />
+                            <button type="submit" class="btn danger-soft">Reject</button>
+                        </form>
+                    </div>
+                }
+            </article>
+        }
+    </section>
+
+    @foreach (var grid in _model.Grids)
+    {
+        <DataGridView Grid="@grid" />
+    }
+}
+
+@code {
+    private WorkspaceModel? _model;
+    private IReadOnlyList<OrganizationActionItem>? _organizations;
+    private AppUser? _user;
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        _user = AppUser.FromClaims(state.User);
+        _model = await Platform.OrganizationsAsync();
+        _organizations = await Ops.ListOrganizationsAsync(_user);
+    }
+}

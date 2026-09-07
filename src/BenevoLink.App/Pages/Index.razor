@@ -1,0 +1,23 @@
+@page "/"
+@attribute [Authorize]
+@inject PlatformService Platform
+@inject AuthenticationStateProvider AuthState
+
+@if (_model is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Loading BenevoLink command center…</strong></section>
+}
+else
+{
+    <WorkspaceView Model="_model" />
+}
+
+@code {
+    private WorkspaceModel? _model;
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        var user = AppUser.FromClaims(state.User);
+        _model = await Platform.DashboardAsync(user);
+    }
+}

@@ -1,0 +1,130 @@
+@page "/missions"
+@attribute [Authorize]
+@inject PlatformService Platform
+@inject OperationsService Ops
+@inject AuthenticationStateProvider AuthState
+
+@if (_model is null || _missions is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Loading mission marketplace…</strong></section>
+}
+else
+{
+    <PageHero Eyebrow="BenevoLink ImpactOS" Title="Mission Discovery" Subtitle="Apply, save, create, open, and close missions through real server actions connected to your XAMPP benevolink database." />
+    <KpiStrip Items="@_model.Kpis" />
+
+    <section class="action-console split pro-form-card">
+        <div>
+            <div class="eyebrow">Volunteer command</div>
+            <h3>Find work that matters</h3>
+            <p>Every action below is a normal server POST. It does not depend on fragile UI-only clicks.</p>
+        </div>
+        <div class="console-controls">
+            <input class="control-input" placeholder="Search missions, causes, cities…" @bind="_search" @bind:event="oninput" />
+        </div>
+    </section>
+
+    @if (CanCreate)
+    {
+        <form class="creation-panel pro-form-card" method="post" action="/actions/mission/create">
+            <input type="hidden" name="returnUrl" value="/missions" />
+            <div>
+                <div class="eyebrow">Organization studio</div>
+                <h3>Create a mission</h3>
+                <p>Creates a mission inside the BenevoLink action layer and mirrors into your existing table when compatible.</p>
+            </div>
+            <div class="creation-grid">
+                <input class="control-input" name="title" placeholder="Mission title" required />
+                <input class="control-input" name="cause" placeholder="Cause / SDG / ODD" />
+                <input class="control-input" name="location" placeholder="Location" />
+                <input class="control-input" name="date" type="date" value='@DateTime.Today.AddDays(7).ToString("yyyy-MM-dd")' />
+                <textarea class="control-input span-2" name="description" rows="3" placeholder="Mission description"></textarea>
+                <button type="submit" class="btn primary">Create mission</button>
+            </div>
+        </form>
+    }
+
+    <section class="mission-market">
+        @foreach (var mission in FilteredMissions)
+        {
+            <article class="mission-tile mission-tile-fixed">
+                <div class="entity-head">
+                    <span class="source-chip">@mission.Source</span>
+                    <StatusPill Text="@(mission.ApplicationStatus ?? mission.Status)" />
+                </div>
+                <h3>@mission.Title</h3>
+                <p>@mission.Description</p>
+                <div class="mission-meta">
+                    <span>🏢 @mission.Organization</span>
+                    <span>📍 @mission.Location</span>
+                    <span>🎯 @mission.Cause</span>
+                    @if (!string.IsNullOrWhiteSpace(mission.Date)) { <span>🗓 @mission.Date</span> }
+                </div>
+                <div class="mission-actions form-actions">
+                    @if (mission.ApplicationStatus is null)
+                    {
+                        <form method="post" action="/actions/mission/apply" class="inline-action-form grow-form">
+                            <input type="hidden" name="returnUrl" value="/missions" />
+                            <input type="hidden" name="missionId" value="@mission.Id" />
+                            <textarea class="control-input compact-note" name="motivation" rows="2" placeholder="Short application message"></textarea>
+                            <button type="submit" class="btn primary">Enroll / Apply</button>
+                        </form>
+                    }
+                    else if (_user?.Role == "Volunteer")
+                    {
+                        <form method="post" action="/actions/mission/withdraw" class="inline-action-form">
+                            <input type="hidden" name="returnUrl" value="/missions" />
+                            <input type="hidden" name="missionId" value="@mission.Id" />
+                            <button type="submit" class="btn danger-soft">Withdraw</button>
+                        </form>
+                    }
+
+                    <form method="post" action="/actions/mission/save" class="inline-action-form">
+                        <input type="hidden" name="returnUrl" value="/missions" />
+                        <input type="hidden" name="missionId" value="@mission.Id" />
+                        <button type="submit" class="btn ghost" disabled="@mission.IsSaved">@(mission.IsSaved ? "Saved" : "Save mission")</button>
+                    </form>
+
+                    @if (CanCreate)
+                    {
+                        <form method="post" action="/actions/mission/status" class="inline-action-form">
+                            <input type="hidden" name="returnUrl" value="/missions" />
+                            <input type="hidden" name="missionId" value="@mission.Id" />
+                            <input type="hidden" name="status" value="Open" />
+                            <button type="submit" class="btn ghost">Open</button>
+                        </form>
+                        <form method="post" action="/actions/mission/status" class="inline-action-form">
+                            <input type="hidden" name="returnUrl" value="/missions" />
+                            <input type="hidden" name="missionId" value="@mission.Id" />
+                            <input type="hidden" name="status" value="Closed" />
+                            <button type="submit" class="btn danger-soft">Close</button>
+                        </form>
+                    }
+                </div>
+            </article>
+        }
+    </section>
+
+    @foreach (var grid in _model.Grids)
+    {
+        <DataGridView Grid="@grid" />
+    }
+}
+
+@code {
+    private WorkspaceModel? _model;
+    private IReadOnlyList<MissionActionItem>? _missions;
+    private AppUser? _user;
+    private string _search = "";
+    private bool CanCreate => _user?.Role is "Organization" or "Admin";
+    private IEnumerable<MissionActionItem> FilteredMissions => string.IsNullOrWhiteSpace(_search)
+        ? _missions ?? Array.Empty<MissionActionItem>()
+        : (_missions ?? Array.Empty<MissionActionItem>()).Where(m => (m.Title + " " + m.Description + " " + m.Location + " " + m.Cause + " " + m.Organization).Contains(_search, StringComparison.OrdinalIgnoreCase));
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        _user = AppUser.FromClaims(state.User);
+        _model = await Platform.MissionsAsync();
+        _missions = await Ops.ListMissionsAsync(_user);
+    }
+}

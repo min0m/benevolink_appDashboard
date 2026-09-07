@@ -1,0 +1,91 @@
+@page "/impact"
+@attribute [Authorize]
+@inject PlatformService Platform
+@inject OperationsService Ops
+@inject AuthenticationStateProvider AuthState
+
+@if (_model is null || _goals is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Loading impact analytics…</strong></section>
+}
+else
+{
+    <PageHero Eyebrow="Analytics" Title="Impact & SDG / ODD Tracking" Subtitle="Create goals, update progress, complete milestones, and review impact data." />
+    <KpiStrip Items="@_model.Kpis" />
+
+    <section class="creation-panel two-columns pro-form-card">
+        <form method="post" action="/actions/impact/create" class="form-stack professional-form-stack">
+            <input type="hidden" name="returnUrl" value="/impact" />
+            <div class="eyebrow">New impact goal</div>
+            <h3>Create goal</h3>
+            <input class="control-input" name="title" placeholder="Goal title" required />
+            <input class="control-input" name="sdg" placeholder="SDG / ODD" />
+            <input class="control-input" name="target" placeholder="Target value" />
+            <input class="control-input" name="deadline" type="date" />
+            <button type="submit" class="btn primary">Create goal</button>
+        </form>
+
+        <form method="post" action="/actions/impact/update" class="form-stack professional-form-stack">
+            <input type="hidden" name="returnUrl" value="/impact" />
+            <div class="eyebrow">Progress editor</div>
+            <h3>Update goal</h3>
+            <input class="control-input" name="goalId" placeholder="Goal ID" required />
+            <input class="control-input" name="progress" placeholder="Current progress / value" />
+            <select class="control-input" name="status">
+                <option>Active</option>
+                <option>At Risk</option>
+                <option>Completed</option>
+                <option>Paused</option>
+            </select>
+            <button type="submit" class="btn primary">Update goal</button>
+        </form>
+    </section>
+
+    <section class="mission-market">
+        @foreach (var goal in _goals)
+        {
+            <article class="mission-tile mission-tile-fixed">
+                <div class="entity-head">
+                    <span class="source-chip">@goal.Source</span>
+                    <StatusPill Text="@goal.Status" />
+                </div>
+                <h3>@goal.Title</h3>
+                <div class="mission-meta">
+                    <span>ID: @goal.Id</span>
+                    <span>🎯 Target: @goal.Target</span>
+                    <span>📈 Current: @goal.Current</span>
+                    <span>🌍 @goal.Sdg</span>
+                    <span>🗓 @goal.Date</span>
+                </div>
+                <div class="impact-meter"><span style="width:@ProgressWidth(goal.Current)"></span></div>
+                <div class="mission-actions form-actions">
+                    <form method="post" action="/actions/impact/complete" class="inline-action-form">
+                        <input type="hidden" name="returnUrl" value="/impact" />
+                        <input type="hidden" name="goalId" value="@goal.Id" />
+                        <button type="submit" class="btn primary">Complete</button>
+                    </form>
+                </div>
+            </article>
+        }
+    </section>
+
+    @foreach (var grid in _model.Grids)
+    {
+        <DataGridView Grid="@grid" />
+    }
+}
+
+@code {
+    private WorkspaceModel? _model;
+    private IReadOnlyList<ImpactGoalActionItem>? _goals;
+    protected override async Task OnInitializedAsync()
+    {
+        _model = await Platform.ImpactAsync();
+        _goals = await Ops.ListImpactGoalsAsync();
+    }
+    private static string ProgressWidth(string current)
+    {
+        var digits = new string((current ?? "").Where(c => char.IsDigit(c) || c == '.').ToArray());
+        return decimal.TryParse(digits, out var value) ? $"{Math.Clamp(value, 0, 100):0}%" : "35%";
+    }
+}

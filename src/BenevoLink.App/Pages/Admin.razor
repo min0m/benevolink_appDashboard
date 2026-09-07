@@ -1,0 +1,126 @@
+@page "/admin"
+@attribute [Authorize(Roles="Admin")]
+@inject PlatformService Platform
+@inject OperationsService Ops
+@inject AuthenticationStateProvider AuthState
+
+@if (_model is null || _organizations is null || _audit is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Loading admin control center…</strong></section>
+}
+else
+{
+    <PageHero Eyebrow="Administration" Title="Admin Control Center" Subtitle="User creation, NGO verification, broadcast messages, audit logs, and database oversight." Health="@_model.Health" />
+    <KpiStrip Items="@_model.Kpis" />
+
+    <section class="creation-panel two-columns pro-form-card">
+        <form method="post" action="/actions/admin/user" class="form-stack professional-form-stack">
+            <input type="hidden" name="returnUrl" value="/admin" />
+            <div class="eyebrow">User management</div>
+            <h3>Create user</h3>
+            <input class="control-input" name="name" placeholder="Full name" required />
+            <input class="control-input" name="email" type="email" placeholder="Email" required />
+            <input class="control-input" name="password" type="password" placeholder="Password" required />
+            <select class="control-input" name="role">
+                <option>Volunteer</option>
+                <option>Organization</option>
+                <option>Admin</option>
+            </select>
+            <button type="submit" class="btn primary">Create user</button>
+        </form>
+
+        <form method="post" action="/actions/message/send" class="form-stack professional-form-stack">
+            <input type="hidden" name="returnUrl" value="/admin" />
+            <div class="eyebrow">Broadcast / security notice</div>
+            <h3>Send notification</h3>
+            <input class="control-input" name="recipientId" value="all" />
+            <input class="control-input" name="title" placeholder="Notification title" />
+            <textarea class="control-input textarea-pro" name="message" rows="4" placeholder="Message"></textarea>
+            <button type="submit" class="btn primary">Send notification</button>
+        </form>
+    </section>
+
+    <section class="action-console split pro-form-card">
+        <div>
+            <div class="eyebrow">NGO verification</div>
+            <h3>Manual verification action</h3>
+            <p>Use an association/NGO ID from the cards below.</p>
+        </div>
+        <form method="post" action="/actions/organization/verify" class="console-controls">
+            <input type="hidden" name="returnUrl" value="/admin" />
+            <input class="control-input" name="associationId" placeholder="Association / NGO ID" required />
+            <div class="inline-row">
+                <button type="submit" name="decision" value="Verified" class="btn primary">Verify</button>
+                <button type="submit" name="decision" value="Rejected" class="btn danger-soft">Reject</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="mission-market">
+        @foreach (var org in _organizations.Take(12))
+        {
+            <article class="mission-tile mission-tile-fixed">
+                <div class="entity-head">
+                    <span class="source-chip">@org.Source</span>
+                    <StatusPill Text="@org.Status" />
+                </div>
+                <h3>@org.Name</h3>
+                <p>@org.Description</p>
+                <div class="mission-meta">
+                    <span>ID: @org.Id</span>
+                    <span>@org.Sector</span>
+                    <span>@org.City</span>
+                </div>
+                <div class="mission-actions form-actions">
+                    <form method="post" action="/actions/organization/verify" class="inline-action-form">
+                        <input type="hidden" name="returnUrl" value="/admin" />
+                        <input type="hidden" name="associationId" value="@org.Id" />
+                        <input type="hidden" name="decision" value="Verified" />
+                        <button type="submit" class="btn primary">Verify</button>
+                    </form>
+                    <form method="post" action="/actions/organization/verify" class="inline-action-form">
+                        <input type="hidden" name="returnUrl" value="/admin" />
+                        <input type="hidden" name="associationId" value="@org.Id" />
+                        <input type="hidden" name="decision" value="Rejected" />
+                        <button type="submit" class="btn danger-soft">Reject</button>
+                    </form>
+                </div>
+            </article>
+        }
+    </section>
+
+    <section class="data-panel">
+        <header><div><h3>Action audit trail</h3><p>Recent actions created by this app.</p></div></header>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Type</th><th>Actor</th><th>Message</th><th>Date</th></tr></thead>
+                <tbody>
+                    @foreach (var item in _audit)
+                    {
+                        <tr><td>@item.Type</td><td>@item.Actor</td><td>@item.Message</td><td>@item.Date</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    @foreach (var grid in _model.Grids)
+    {
+        <DataGridView Grid="@grid" />
+    }
+}
+
+@code {
+    private WorkspaceModel? _model;
+    private IReadOnlyList<OrganizationActionItem>? _organizations;
+    private IReadOnlyList<AuditActionItem>? _audit;
+    private AppUser? _user;
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        _user = AppUser.FromClaims(state.User);
+        _model = await Platform.AdminAsync();
+        _organizations = await Ops.ListOrganizationsAsync(_user);
+        _audit = await Ops.ListAuditAsync();
+    }
+}

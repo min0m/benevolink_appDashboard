@@ -1,0 +1,28 @@
+@page "/"
+@namespace BenevoLink.Pages
+@using BenevoLink
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BenevoLink ImpactOS V15</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="css/app-v15.css?v=15.0.0" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231E6BFF'/%3E%3Cpath d='M18 34c8-16 20-16 28 0-8 14-20 14-28 0Z' fill='white'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%231E6BFF'/%3E%3C/svg%3E" />
+</head>
+<body>
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
+    <div id="blazor-error-ui">
+        BenevoLink hit a runtime error. Refresh the app after confirming XAMPP MySQL is running.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">×</a>
+    </div>
+    <script src="_framework/blazor.server.js"></script>
+    <script src="js/benevolink.js"></script>
+</body>
+</html>

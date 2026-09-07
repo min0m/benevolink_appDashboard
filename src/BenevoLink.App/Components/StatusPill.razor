@@ -1,0 +1,16 @@
+<span class="status-pill @Tone">@Text</span>
+
+@code {
+    [Parameter] public string Text { get; set; } = "Live";
+    private string Tone
+    {
+        get
+        {
+            var t = Text.ToLowerInvariant();
+            if (t.Contains("approved") || t.Contains("active") || t.Contains("verified") || t.Contains("online")) return "success";
+            if (t.Contains("pending") || t.Contains("review") || t.Contains("wait")) return "warning";
+            if (t.Contains("reject") || t.Contains("suspend") || t.Contains("offline") || t.Contains("fail")) return "danger";
+            return "neutral";
+        }
+    }
+}

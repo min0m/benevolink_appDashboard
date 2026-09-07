@@ -1,0 +1,29 @@
+<section class="kpi-grid">
+    @foreach (var item in Items)
+    {
+        <article class="kpi-card @item.Tone">
+            <div class="kpi-icon">@IconGlyph(item.Icon)</div>
+            <div>
+                <span>@item.Label</span>
+                <strong>@item.Value</strong>
+                <small>@item.Detail</small>
+            </div>
+        </article>
+    }
+</section>
+
+@code {
+    [Parameter] public IReadOnlyList<KpiCard> Items { get; set; } = [];
+    private static string IconGlyph(string icon) => icon switch
+    {
+        "users" => "◍",
+        "target" => "◎",
+        "inbox" => "▤",
+        "calendar" => "◇",
+        "database" => "▥",
+        "shield" => "⬟",
+        "layers" => "▣",
+        "server" => "⌬",
+        _ => "◈"
+    };
+}

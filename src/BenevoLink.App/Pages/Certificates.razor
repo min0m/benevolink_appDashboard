@@ -1,0 +1,70 @@
+@page "/certificates"
+@attribute [Authorize]
+@inject OperationsService Ops
+@inject AuthenticationStateProvider AuthState
+
+@if (_certificates is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Building impact passport…</strong></section>
+}
+else
+{
+    <PageHero Eyebrow="Impact Passport" Title="Certificates" Subtitle="Generate printable participation certificates from approved applications, attendance, participations, or volunteer hours." />
+
+    <section class="action-console split no-print">
+        <div>
+            <div class="eyebrow">Certificate engine</div>
+            <h3>@_certificates.Count certificate-ready records</h3>
+            <p>Only positive participation statuses are shown. Use the print button to export as PDF from the browser.</p>
+        </div>
+        <button type="button" class="btn primary" onclick="window.print()">Print / Save as PDF</button>
+    </section>
+
+    @if (_certificates.Count == 0)
+    {
+        <section class="empty-state">
+            <div class="empty-icon">⌁</div>
+            <h3>No certificate-ready records yet</h3>
+            <p>Approve an application or validate attendance first, then return here.</p>
+        </section>
+    }
+    else
+    {
+        <section class="certificate-grid">
+            @foreach (var cert in _certificates)
+            {
+                <article class="certificate-card">
+                    <div class="certificate-border">
+                        <div class="brand certificate-brand"><span class="brand-mark">B</span><span><strong>BenevoLink</strong><em>ImpactOS Certificate</em></span></div>
+                        <div class="cert-kicker">Certificate of Social Impact</div>
+                        <h2>@cert.Volunteer</h2>
+                        <p>is recognized for verified contribution to</p>
+                        <h3>@cert.Activity</h3>
+                        <div class="cert-meta">
+                            <span>Organization: <strong>@cert.Organization</strong></span>
+                            <span>Hours: <strong>@cert.Hours</strong></span>
+                            <span>Date: <strong>@cert.Date</strong></span>
+                            <span>Status: <strong>@cert.Status</strong></span>
+                        </div>
+                        <footer>
+                            <span>Source: @cert.Source #@cert.Id</span>
+                            <strong>BenevoLink Verified Impact Passport</strong>
+                        </footer>
+                    </div>
+                </article>
+            }
+        </section>
+    }
+}
+
+@code {
+    private IReadOnlyList<CertificateActionItem>? _certificates;
+    private AppUser? _user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        _user = AppUser.FromClaims(state.User);
+        if (_user is not null) _certificates = await Ops.ListCertificatesAsync(_user);
+    }
+}

@@ -1,0 +1,85 @@
+@page "/applications"
+@attribute [Authorize]
+@inject PlatformService Platform
+@inject OperationsService Ops
+@inject AuthenticationStateProvider AuthState
+
+@if (_model is null || _applications is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Loading approval workflow…</strong></section>
+}
+else
+{
+    <PageHero Eyebrow="Workflow" Title="Applications & Approvals" Subtitle="Accept, reject, and track mission applications with real POST actions backed by MySQL." />
+    <KpiStrip Items="@_model.Kpis" />
+
+    <section class="action-console split pro-form-card">
+        <div>
+            <div class="eyebrow">Live workflow</div>
+            <h3>@(CanReview ? "Review volunteer applications" : "Your application status")</h3>
+            <p>@(CanReview ? "Approve or reject applications. Approved applications create participation records in the BenevoLink action layer." : "See whether organizations accepted, rejected, or are still reviewing your applications.")</p>
+        </div>
+        <div class="console-controls">
+            <input class="control-input" placeholder="Search applicant, mission, status…" @bind="_search" @bind:event="oninput" />
+        </div>
+    </section>
+
+    <section class="workflow-list">
+        @foreach (var app in FilteredApplications)
+        {
+            <article class="workflow-card workflow-card-fixed">
+                <div class="workflow-main">
+                    <div class="entity-head">
+                        <span class="source-chip">@app.Source</span>
+                        <StatusPill Text="@app.Status" />
+                    </div>
+                    <h3>@app.Mission</h3>
+                    <p><strong>@app.Applicant</strong> · @app.Motivation</p>
+                    @if (!string.IsNullOrWhiteSpace(app.SubmittedAt))
+                    {
+                        <small>Submitted: @app.SubmittedAt</small>
+                    }
+                </div>
+                @if (CanReview)
+                {
+                    <div class="workflow-actions stacked-actions">
+                        <form method="post" action="/actions/application/decide" class="review-form">
+                            <input type="hidden" name="returnUrl" value="/applications" />
+                            <input type="hidden" name="applicationId" value="@app.Id" />
+                            <textarea class="control-input compact-note" rows="2" name="note" placeholder="Reviewer note"></textarea>
+                            <div class="inline-row">
+                                <button type="submit" name="decision" value="approve" class="btn primary">Accept</button>
+                                <button type="submit" name="decision" value="reject" class="btn danger-soft">Reject</button>
+                            </div>
+                        </form>
+                    </div>
+                }
+            </article>
+        }
+    </section>
+
+    @foreach (var grid in _model.Grids)
+    {
+        <DataGridView Grid="@grid" />
+    }
+}
+
+@code {
+    private WorkspaceModel? _model;
+    private IReadOnlyList<ApplicationActionItem>? _applications;
+    private AppUser? _user;
+    private string _search = "";
+    private bool CanReview => _user?.Role is "Organization" or "Admin";
+
+    private IEnumerable<ApplicationActionItem> FilteredApplications => string.IsNullOrWhiteSpace(_search)
+        ? _applications ?? Array.Empty<ApplicationActionItem>()
+        : (_applications ?? Array.Empty<ApplicationActionItem>()).Where(a => (a.Applicant + " " + a.Mission + " " + a.Status + " " + a.Motivation).Contains(_search, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        _user = AppUser.FromClaims(state.User);
+        _model = await Platform.ApplicationsAsync();
+        if (_user is not null) _applications = await Ops.ListApplicationsAsync(_user);
+    }
+}

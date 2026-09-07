@@ -1,0 +1,73 @@
+@page "/login"
+@layout AuthLayout
+@inject NavigationManager Nav
+
+<section class="login-shell">
+    <div class="login-brand-panel">
+        <div class="brand premium"><span class="brand-mark">B</span><span><strong>BenevoLink</strong><em>ImpactOS</em></span></div>
+        <h1>Enterprise-grade volunteer, NGO, mission, and social impact operating system.</h1>
+        <p>Directly linked to your existing XAMPP MySQL database named <strong>benevolink</strong>. No SQLite. No fake replacement data. No migration overwrite.</p>
+        <div class="login-metrics">
+            <span><strong>26</strong> detected workspace objects</span>
+            <span><strong>Light</strong> high-end app mode</span>
+            <span><strong>Live</strong> MySQL session</span>
+        </div>
+    </div>
+
+    <form class="login-card" method="post" action="/auth/login">
+        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+        <div class="eyebrow">Secure sign in</div>
+        <h2>Open BenevoLink</h2>
+        <p>Use your existing demo accounts from the XAMPP database.</p>
+        @if (Registered)
+        {
+            <div class="alert success">Account created. You can now sign in.</div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Error))
+        {
+            <div class="alert danger">@Error</div>
+        }
+        @if (LoggedOut)
+        {
+            <div class="alert success">Signed out successfully.</div>
+        }
+
+        <label>Email</label>
+        <input name="email" type="email" autocomplete="username" value="admin@benevolink.test" required />
+        <label>Password</label>
+        <input name="password" type="password" autocomplete="current-password" value="admin123" required />
+        <label class="checkline"><input name="remember" type="checkbox" /> Keep me signed in</label>
+        <button class="btn primary wide" type="submit">Launch command center</button>
+        <a class="btn ghost wide" href="/register">Create a new account</a>
+
+        <div class="demo-grid">
+            <button type="button" onclick="benevoFillLogin('admin@benevolink.test', 'admin123')">Admin</button>
+            <button type="button" onclick="benevoFillLogin('salma@croissant.test', 'resp123')">Salma</button>
+            <button type="button" onclick="benevoFillLogin('karim@jeunes.test', 'resp123')">Karim</button>
+            <button type="button" onclick="benevoFillLogin('yasmine@demo.test', 'bene123')">Yasmine</button>
+        </div>
+    </form>
+</section>
+
+<script>
+window.benevoFillLogin = function(email, password) {
+    document.querySelector('input[name="email"]').value = email;
+    document.querySelector('input[name="password"]').value = password;
+};
+</script>
+
+@code {
+    private string Error => Query("error");
+    private string ReturnUrl => string.IsNullOrWhiteSpace(Query("returnUrl")) ? "/" : Query("returnUrl");
+    private bool LoggedOut => Query("loggedout") == "true";
+    private bool Registered => Query("registered") == "true";
+
+    private string Query(string key)
+    {
+        var uri = new Uri(Nav.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        return query.TryGetValue(key, out var value) ? value.ToString() : "";
+    }
+
+}

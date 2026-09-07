@@ -1,0 +1,97 @@
+@page "/volunteers"
+@attribute [Authorize]
+@inject PlatformService Platform
+@inject OperationsService Ops
+@inject AuthenticationStateProvider AuthState
+
+@if (_model is null || _volunteers is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Loading volunteer system…</strong></section>
+}
+else
+{
+    <PageHero Eyebrow="Volunteer System" Title="Volunteer Directory" Subtitle="Manage skills, hours, and direct messages with server-side MySQL actions." />
+    <KpiStrip Items="@_model.Kpis" />
+
+    <section class="creation-panel two-columns pro-form-card">
+        <form method="post" action="/actions/volunteer/skill" class="form-stack professional-form-stack">
+            <input type="hidden" name="returnUrl" value="/volunteers" />
+            <div class="eyebrow">Skills</div>
+            <h3>Add skill</h3>
+            <input class="control-input" name="volunteerId" placeholder="Volunteer/User ID (blank = yourself)" />
+            <input class="control-input" name="skill" placeholder="Skill name" required />
+            <button type="submit" class="btn primary">Add skill</button>
+        </form>
+
+        <form method="post" action="/actions/volunteer/hours" class="form-stack professional-form-stack">
+            <input type="hidden" name="returnUrl" value="/volunteers" />
+            <div class="eyebrow">Impact hours</div>
+            <h3>Record hours</h3>
+            <input class="control-input" name="volunteerId" placeholder="Volunteer/User ID" required />
+            <input class="control-input" name="sourceId" placeholder="Mission/Event ID" />
+            <input class="control-input" name="hours" type="number" step="0.5" min="0.5" value="1" />
+            <textarea class="control-input textarea-pro" rows="3" name="note" placeholder="Validation note"></textarea>
+            <button type="submit" class="btn primary">Record hours</button>
+        </form>
+    </section>
+
+    <section class="action-console split pro-form-card">
+        <div>
+            <div class="eyebrow">Recruitment message</div>
+            <h3>Contact a volunteer</h3>
+            <p>Use the user ID shown on any card below.</p>
+        </div>
+        <form method="post" action="/actions/message/send" class="console-controls">
+            <input type="hidden" name="returnUrl" value="/volunteers" />
+            <input class="control-input" name="recipientId" placeholder="Volunteer/User ID" required />
+            <input class="control-input" name="title" placeholder="Subject" />
+            <textarea class="control-input textarea-pro" rows="3" name="message" placeholder="Message"></textarea>
+            <button type="submit" class="btn primary">Send message</button>
+        </form>
+    </section>
+
+    <section class="mission-market">
+        @foreach (var volunteer in _volunteers)
+        {
+            <article class="mission-tile mission-tile-fixed">
+                <div class="entity-head">
+                    <span class="source-chip">@volunteer.Source</span>
+                    <StatusPill Text="@volunteer.Status" />
+                </div>
+                <h3>@volunteer.Name</h3>
+                <p>@volunteer.Email</p>
+                <div class="mission-meta">
+                    <span>ID: @volunteer.Id</span>
+                    <span>Role: @volunteer.Role</span>
+                    <span>City: @volunteer.City</span>
+                    <span>Hours: @volunteer.Hours</span>
+                    <span>Skills: @volunteer.Skills</span>
+                </div>
+                <div class="mission-actions form-actions">
+                    <form method="post" action="/actions/message/send" class="inline-action-form grow-form">
+                        <input type="hidden" name="returnUrl" value="/volunteers" />
+                        <input type="hidden" name="recipientId" value="@volunteer.Id" />
+                        <input class="control-input" name="title" value="BenevoLink opportunity" />
+                        <textarea class="control-input compact-note" name="message" rows="2" placeholder="Message"></textarea>
+                        <button type="submit" class="btn ghost">Send</button>
+                    </form>
+                </div>
+            </article>
+        }
+    </section>
+
+    @foreach (var grid in _model.Grids)
+    {
+        <DataGridView Grid="@grid" />
+    }
+}
+
+@code {
+    private WorkspaceModel? _model;
+    private IReadOnlyList<VolunteerActionItem>? _volunteers;
+    protected override async Task OnInitializedAsync()
+    {
+        _model = await Platform.VolunteersAsync();
+        _volunteers = await Ops.ListVolunteersAsync();
+    }
+}

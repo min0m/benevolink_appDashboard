@@ -1,0 +1,98 @@
+@page "/database"
+@attribute [Authorize(Roles = "Admin")]
+@inject PlatformService Platform
+@inject OperationsService Ops
+@inject NavigationManager Nav
+
+@if (_model is null || _db is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Loading database studio…</strong></section>
+}
+else
+{
+    <PageHero Eyebrow="Database Studio" Title="XAMPP MySQL Control Surface" Subtitle="Browse, insert, update, and delete records from your existing benevolink database. Admin only. No schema replacement." Health="@_model.Health" />
+    <KpiStrip Items="@_model.Kpis" />
+
+    <section class="creation-panel two-columns pro-form-card">
+        <div>
+            <div class="eyebrow">Table browser</div>
+            <h3>@_db.SelectedTable</h3>
+            <p>@_db.Columns.Count columns · @_db.Rows.Count rows loaded · ID column: @(string.IsNullOrWhiteSpace(_db.IdColumn) ? "not detected" : _db.IdColumn)</p>
+            <form method="get" action="/database" class="creation-grid compact">
+                <select class="control-input span-2" name="table">
+                    @foreach (var table in _db.Tables)
+                    {
+                        <option value="@table.Name" selected="@(table.Name == _db.SelectedTable)">@table.Name (@table.Rows rows)</option>
+                    }
+                </select>
+                <button type="submit" class="btn ghost">Open table</button>
+            </form>
+        </div>
+        <form method="post" action="/actions/database/insert" class="form-stack professional-form-stack">
+            <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+            <input type="hidden" name="table" value="@_db.SelectedTable" />
+            <div class="eyebrow">Raw action</div>
+            <h3>Insert record</h3>
+            <p>Use one <strong>field=value</strong> pair per line. Unknown fields are ignored safely.</p>
+            <textarea class="control-input textarea-pro" name="values" rows="6" placeholder="title=New mission&#10;status=Open&#10;created_at=2026-05-03"></textarea>
+            <button type="submit" class="btn primary">Insert into @_db.SelectedTable</button>
+        </form>
+    </section>
+
+    <section class="creation-panel two-columns pro-form-card">
+        <form method="post" action="/actions/database/update" class="form-stack professional-form-stack">
+            <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+            <input type="hidden" name="table" value="@_db.SelectedTable" />
+            <div class="eyebrow">Cell editor</div>
+            <h3>Update one field</h3>
+            <input class="control-input" name="rowId" placeholder="Row ID" required />
+            <select class="control-input" name="column" required>
+                @foreach (var col in _db.Columns)
+                {
+                    <option value="@col.Name">@col.Name</option>
+                }
+            </select>
+            <input class="control-input" name="value" placeholder="New value" />
+            <button type="submit" class="btn primary">Update cell</button>
+        </form>
+        <form method="post" action="/actions/database/delete" class="form-stack professional-form-stack danger-zone">
+            <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+            <input type="hidden" name="table" value="@_db.SelectedTable" />
+            <div class="eyebrow">Delete row</div>
+            <h3>Danger zone</h3>
+            <p>Deletes one row by detected ID column. This is real; use carefully.</p>
+            <input class="control-input" name="rowId" placeholder="Row ID" required />
+            <button type="submit" class="btn danger-soft">Delete row</button>
+        </form>
+    </section>
+
+    @if (_db.Rows.Count == 0)
+    {
+        <section class="empty-state"><div class="empty-icon">∅</div><h3>No rows loaded</h3><p>Pick another table or insert a new record.</p></section>
+    }
+    else
+    {
+        <DataGridView Grid="@(new DataGrid { Title = "Live table: " + _db.SelectedTable, Subtitle = "Rows read directly from XAMPP MySQL", Source = _db.SelectedTable, Rows = _db.Rows, IsLive = true })" />
+    }
+
+    @foreach (var grid in _model.Grids)
+    {
+        <DataGridView Grid="@grid" />
+    }
+}
+
+@code {
+    private WorkspaceModel? _model;
+    private DatabaseTableWorkspace? _db;
+    private string? _table;
+    private string ReturnUrl => string.IsNullOrWhiteSpace(_db?.SelectedTable) ? "/database" : "/database?table=" + Uri.EscapeDataString(_db.SelectedTable);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(Nav.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        _table = query.TryGetValue("table", out var value) ? value.ToString() : "";
+        _model = await Platform.DatabaseAsync();
+        _db = await Ops.DatabaseWorkspaceAsync(_table ?? "");
+    }
+}

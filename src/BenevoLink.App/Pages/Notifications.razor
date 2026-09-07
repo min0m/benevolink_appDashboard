@@ -1,0 +1,69 @@
+@page "/notifications"
+@attribute [Authorize]
+@inject PlatformService Platform
+@inject OperationsService Ops
+@inject AuthenticationStateProvider AuthState
+
+@if (_model is null || _notifications is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Loading notification center…</strong></section>
+}
+else
+{
+    <PageHero Eyebrow="Comms" Title="Notification Center" Subtitle="Messages, alerts, feedback, recruitment notes, and read tracking connected to MySQL." />
+    <KpiStrip Items="@_model.Kpis" />
+
+    <section class="action-console split pro-form-card">
+        <div>
+            <div class="eyebrow">Inbox actions</div>
+            <h3>Manage notifications</h3>
+            <p>Mark one message or all messages as read using normal server actions.</p>
+        </div>
+        <form method="post" action="/actions/notifications/read-all" class="console-controls">
+            <input type="hidden" name="returnUrl" value="/notifications" />
+            <button type="submit" class="btn primary">Mark all read</button>
+        </form>
+    </section>
+
+    <section class="workflow-list">
+        @foreach (var item in _notifications)
+        {
+            <article class="workflow-card workflow-card-fixed">
+                <div class="workflow-main">
+                    <div class="entity-head">
+                        <span class="source-chip">@item.Source</span>
+                        <StatusPill Text="@item.Status" />
+                    </div>
+                    <h3>@item.Title</h3>
+                    <p>@item.Body</p>
+                    <small>@item.Date</small>
+                </div>
+                <div class="workflow-actions">
+                    <form method="post" action="/actions/notifications/read" class="inline-action-form">
+                        <input type="hidden" name="returnUrl" value="/notifications" />
+                        <input type="hidden" name="notificationId" value="@item.Id" />
+                        <button type="submit" class="btn ghost">Mark read</button>
+                    </form>
+                </div>
+            </article>
+        }
+    </section>
+
+    @foreach (var grid in _model.Grids)
+    {
+        <DataGridView Grid="@grid" />
+    }
+}
+
+@code {
+    private WorkspaceModel? _model;
+    private IReadOnlyList<NotificationActionItem>? _notifications;
+    private AppUser? _user;
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        _user = AppUser.FromClaims(state.User);
+        _model = await Platform.NotificationsAsync(_user);
+        if (_user is not null) _notifications = await Ops.ListNotificationsAsync(_user);
+    }
+}

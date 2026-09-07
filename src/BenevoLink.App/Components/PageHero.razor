@@ -1,0 +1,22 @@
+<section class="page-hero">
+    <div>
+        <div class="eyebrow">@Eyebrow</div>
+        <h2>@Title</h2>
+        <p>@Subtitle</p>
+    </div>
+    @if (Health is not null)
+    {
+        <div class="health-card @(Health.Online ? "online" : "offline")">
+            <span>@(Health.Online ? "Connected" : "Offline")</span>
+            <strong>@Health.Database</strong>
+            <small>@Health.Message</small>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter] public string Eyebrow { get; set; } = "BenevoLink ImpactOS";
+    [Parameter] public string Title { get; set; } = "Command Center";
+    [Parameter] public string Subtitle { get; set; } = "";
+    [Parameter] public DatabaseHealth? Health { get; set; }
+}

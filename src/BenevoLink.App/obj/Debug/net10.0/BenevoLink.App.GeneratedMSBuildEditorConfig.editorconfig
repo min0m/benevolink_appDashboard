@@ -1,0 +1,144 @@
+is_global = true
+build_property.TargetFramework = net10.0
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v10.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EntryPointFilePath = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = BenevoLink
+build_property.RootNamespace = BenevoLink
+build_property.ProjectDir = D:\PFA BIS\BenevoLink\BenevoLink\src\BenevoLink.App\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 10.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = D:\PFA BIS\BenevoLink\BenevoLink\src\BenevoLink.App
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 10.0
+build_property.EnableCodeStyleSeverity = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Components/ActionAlert.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBY3Rpb25BbGVydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Components/DataGridView.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xEYXRhR3JpZFZpZXcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Components/EntityCardGrid.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xFbnRpdHlDYXJkR3JpZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Components/KpiStrip.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xLcGlTdHJpcC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Components/PageHero.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlSGVyby5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Components/StatusPill.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTdGF0dXNQaWxsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Components/WorkspaceView.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xXb3Jrc3BhY2VWaWV3LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/AccessDenied.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjZXNzRGVuaWVkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Admin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Applications.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXBwbGljYXRpb25zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Certificates.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2VydGlmaWNhdGVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Database.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGF0YWJhc2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Error.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Events.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXZlbnRzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Impact.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW1wYWN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Missions.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWlzc2lvbnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Notifications.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm90aWZpY2F0aW9ucy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Organizations.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JnYW5pemF0aW9ucy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Profile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/Volunteers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVm9sdW50ZWVycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Shared/AuthLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEF1dGhMYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Shared/RedirectToLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFJlZGlyZWN0VG9Mb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PFA BIS/BenevoLink/BenevoLink/src/BenevoLink.App/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 

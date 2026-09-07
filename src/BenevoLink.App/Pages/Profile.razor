@@ -1,0 +1,67 @@
+@page "/profile"
+@attribute [Authorize]
+@inject OperationsService Ops
+@inject AuthenticationStateProvider AuthState
+
+@if (_profile is null || _user is null)
+{
+    <section class="loading-stage"><div class="spinner"></div><strong>Loading profile…</strong></section>
+}
+else
+{
+    <PageHero Eyebrow="Identity" Title="Volunteer Profile" Subtitle="Edit your profile, skills, city, phone, and bio. Changes are saved to the action layer and mirrored when your old users table supports it." />
+
+    <section class="profile-layout">
+        <aside class="profile-card-xl">
+            <div class="profile-avatar">@Initials(_profile.Name)</div>
+            <h2>@_profile.Name</h2>
+            <p>@_profile.Email</p>
+            <StatusPill Text="@_profile.Role" />
+            <div class="skill-cloud">
+                @foreach (var skill in _profile.Skills.DefaultIfEmpty("No skills added yet"))
+                {
+                    <span>@skill</span>
+                }
+            </div>
+        </aside>
+
+        <form class="data-panel profile-editor pro-form-card" method="post" action="/actions/profile/save">
+            <input type="hidden" name="returnUrl" value="/profile" />
+            <header>
+                <div>
+                    <h3>Edit profile</h3>
+                    <p>All fields are polished, aligned, and submitted through a real server action.</p>
+                </div>
+            </header>
+            <div class="form-stack professional-form-stack">
+                <label>Full name</label>
+                <input class="control-input" name="name" value="@_profile.Name" />
+                <label>City</label>
+                <input class="control-input" name="city" value="@_profile.City" />
+                <label>Phone</label>
+                <input class="control-input" name="phone" value="@_profile.Phone" />
+                <label>Bio</label>
+                <textarea class="control-input textarea-pro" name="bio" rows="5">@_profile.Bio</textarea>
+                <label>Add skill</label>
+                <input class="control-input" name="skill" placeholder="Example: Event coordination, first aid, tutoring" />
+                <button type="submit" class="btn primary">Save profile</button>
+            </div>
+        </form>
+    </section>
+}
+
+@code {
+    private AppUser? _user;
+    private ProfileSnapshot? _profile;
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        _user = AppUser.FromClaims(state.User);
+        if (_user is not null) _profile = await Ops.ProfileAsync(_user);
+    }
+    private static string Initials(string value)
+    {
+        var parts = value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length == 0 ? "BL" : string.Concat(parts.Take(2).Select(p => char.ToUpperInvariant(p[0])));
+    }
+}
